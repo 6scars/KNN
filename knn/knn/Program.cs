@@ -20,76 +20,51 @@ public class iris
 
 
 }
-
-
-class Program
+public class E
 {
-    delegate double Metryka(iris A, iris B);
-
-    static List<iris> stworzListe(string sciezka)
+    public static double Euklidesowa(iris a, iris b)
     {
-        List<iris> stworz = new List<iris>();
 
-        if (File.Exists(sciezka))
+        return Math.Sqrt((Math.Pow(a.x - b.x, 2)) + (Math.Pow(a.y - b.y, 2)) + (Math.Pow(a.z - b.z, 2)));
+    }
+
+
+    public static List<List<double>>  topKElements(List<List<iris>> ListaKlas, iris probka)
+    {
+        List<List<double>> odleglosciDlaKlas = new List<List<double>>();
+
+        for(int i =0; i< ListaKlas.Count; i++)
         {
-
-            string[] zawartosc = File.ReadAllLines(sciezka);
-            for (int i = 0; i < zawartosc.Length; i++)
-            {
-                string pierwszaLinia = zawartosc[i];
-                double x = double.Parse(pierwszaLinia.Split('\t')[0], CultureInfo.InvariantCulture);
-                double y = double.Parse(pierwszaLinia.Split('\t')[1], CultureInfo.InvariantCulture);
-                double z = double.Parse(pierwszaLinia.Split('\t')[2], CultureInfo.InvariantCulture);
-                int NrClassy = (int)double.Parse(pierwszaLinia.Split('\t')[3], CultureInfo.InvariantCulture) + 1;
-                stworz.Add(new iris(x, y, z, NrClassy));
-            }
+            odleglosciDlaKlas.Add(new List<double>());
         }
 
-        return stworz;
+
+        for(int  Klasa =0; Klasa< ListaKlas.Count; Klasa++)
+        {
+            for(int xyz =0; xyz < ListaKlas[Klasa].Count; xyz++)
+            {
+
+                odleglosciDlaKlas[Klasa].Add(Euklidesowa(ListaKlas[Klasa][xyz], probka));
+            }
+            
+        }
+        return odleglosciDlaKlas;
     }
 
-
-    public static double[] Euklidesowa(List<List<iris>> A, iris probka)
+    public static List<List<double>> sortowanie(List<List<double>> posortowaneOdleglosci)
     {
-        // int k = 3;
-        // double [] minWynik = new double[3];
-        // minWynik[0] = Math.Pow(A[0][0].x - probka.x, 2) + Math.Pow(A[0][0].y - probka.y, 2) + Math.Pow(A[0][0].z - probka.z, 2);
-        // double temp = minWynik[0];
+        for(int i=0; i< posortowaneOdleglosci.Count; i++)
+        {
+            posortowaneOdleglosci[i].Sort();
+        }
 
-        // foreach (var ob in A[i]) //czyli na klasie pierwszej robie teraz obliczanie
-        // {
-        //     temp = Math.Pow(ob.x - probka.x, 2) + Math.Pow(ob.y - probka.y, 2) + Math.Pow(ob.z - probka.z, 2);
-        // }
-
-        // int i = 0;
-        //if(minWynik.Length > 0)
-        // {
-
-        // }
-        // else
-        // {
-        //     if (minWynik[0] > temp)
-        //     {
-        //         minWynik[0] = Math.Sqrt(temp);
-        //     }
-        // }
-
-
-        //     return minWynik;
+        return posortowaneOdleglosci;
     }
+}
 
-    //double Manhatan(double[] A, double[]B)
-    //{
-    //    double wynik = 0;
-    //    for(int i=0; i<A.Length-1; i++)
-    //    {
-    //        wynik += Math.Abs(A[i] - B[i]);
-    //    }
-    //    return wynik;
-    //}
-
-
-    static List<double[]> minMax(List<iris> obiekty)
+class normalizacja
+{
+    public static List<double[]> minMax(List<iris> obiekty)
     {
         double[] X = { obiekty[0].x, obiekty[0].x };
         double[] Y = { obiekty[0].y, obiekty[0].y };
@@ -137,7 +112,7 @@ class Program
     }
 
 
-    static List<iris> normalizacja(List<iris> obiekty)
+    public  static List<iris> normalizowanie(List<iris> obiekty)
     {
         List<iris> ListaZnorma = new List<iris>();
         List<double[]> lista = minMax(obiekty);
@@ -157,6 +132,61 @@ class Program
 
         return ListaZnorma;
 
+    }
+
+
+}
+
+
+public class najblizsze
+{
+    public static List<double>najblizej(List<List<iris>> podzielonyKlasy, int k, iris probka)
+    {
+        List<List<double>> wartosci = E.topKElements(podzielonyKlasy, probka);
+        wartosci = E.sortowanie(wartosci);
+        List<double> lista = nablizszeW(wartosci, k);
+        return lista;
+    }
+
+    static List<double> nablizszeW(List<List<double>> wartosci, int k)
+    { 
+        List<double> lista = new List<double>();
+        foreach (var klasa in wartosci)
+        {
+            double suma = 0;
+            for (int i = 0; i < k; i++)
+            {
+                suma += klasa[i];
+            }
+            lista.Add(suma);
+        }
+
+        return lista;
+    }
+}
+class Program
+{
+
+    static List<iris> stworzListe(string sciezka)
+    {
+        List<iris> stworz = new List<iris>();
+
+        if (File.Exists(sciezka))
+        {
+
+            string[] zawartosc = File.ReadAllLines(sciezka);
+            for (int i = 0; i < zawartosc.Length; i++)
+            {
+                string pierwszaLinia = zawartosc[i];
+                double x = double.Parse(pierwszaLinia.Split('\t')[0], CultureInfo.InvariantCulture);
+                double y = double.Parse(pierwszaLinia.Split('\t')[1], CultureInfo.InvariantCulture);
+                double z = double.Parse(pierwszaLinia.Split('\t')[2], CultureInfo.InvariantCulture);
+                int NrClassy = (int)double.Parse(pierwszaLinia.Split('\t')[3], CultureInfo.InvariantCulture) + 1;
+                stworz.Add(new iris(x, y, z, NrClassy));
+            }
+        }
+
+        return stworz;
     }
 
 
@@ -190,30 +220,22 @@ class Program
     }
 
 
-    static List<iris> najblizej(List<List<iris>> podzielonyKlasy, int k, iris probka)
-    {
-        List<iris> najblizsze = new List<iris>();
-        double najmWar = Euklidesowa(podzielonyKlasy, probka);
 
-
-
-
-        //foreach (var listaKlasy in podzielonyKlasy)
-        //{
-
-        //}
-        //double najmWart = Euklidesowa(podzielonyKlasy[0], wartoscParaProbki);
-
-
-        return najblizsze;
-    }
 
     static void knn(List<iris> Obiekty, int k, iris probka)
     {
         List<List<iris>> podzieloneKlasy = dzielenieNaKlasy(Obiekty);
-        Console.WriteLine(podzieloneKlasy[0][0].x);
+        List<double> najblizszeW = najblizsze.najblizej(podzieloneKlasy, k, probka);
 
-        najblizej(podzieloneKlasy, k, probka);
+        for(int i =0; i<najblizszeW.Count; i++)
+        {
+            Console.WriteLine("odległości Eukalidesa");
+            Console.Write("dla klasy" + (i+1) + ": ");
+            Console.WriteLine(najblizszeW[i]);
+            Console.WriteLine("");
+        }
+
+        Console.WriteLine("klasa probki: "+probka.klasa);
 
 
 
@@ -227,20 +249,16 @@ class Program
         int k = 3;
         string sciezka = "C:/Users/1/source/repos/knn/dane.txt";
         List<iris> Kwiaty = stworzListe(sciezka);
-        Kwiaty = normalizacja(Kwiaty);
+        Kwiaty = normalizacja.normalizowanie(Kwiaty);
         iris kwiatek = new iris(
             Kwiaty[nr_probki].x,
             Kwiaty[nr_probki].y,
-            Kwiaty[nr_probki].z
+            Kwiaty[nr_probki].z,
+             Kwiaty[nr_probki].klasa
             );
         Kwiaty.RemoveAt(nr_probki);
 
         knn(Kwiaty, k, kwiatek);
-
-
-
-
-
 
 
 
