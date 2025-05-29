@@ -235,7 +235,7 @@ class Program
             Console.WriteLine("");
         }
 
-        Console.WriteLine("klasa probki: "+probka.klasa);
+
 
 
 
@@ -245,23 +245,41 @@ class Program
 
     static void Main()
     {
-        int nr_probki = 5;
         int k = 3;
         string sciezka = "C:/Users/1/source/repos/knn/dane.txt";
         List<iris> Kwiaty = stworzListe(sciezka);
-        Kwiaty = normalizacja.normalizowanie(Kwiaty);
-        iris kwiatek = new iris(
-            Kwiaty[nr_probki].x,
-            Kwiaty[nr_probki].y,
-            Kwiaty[nr_probki].z,
-             Kwiaty[nr_probki].klasa
-            );
-        Kwiaty.RemoveAt(nr_probki);
 
-        knn(Kwiaty, k, kwiatek);
+        
+        Console.WriteLine("Podaj parametr x:");
+        double xUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+        Console.WriteLine("Podaj parametr y:");
+        double yUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+        Console.WriteLine("Podaj parametr z:");
+        double zUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
 
+        
+        iris probka = new iris(xUser, yUser, zUser);
+        List<iris> wszystkieObiekty = new List<iris>(Kwiaty);
+        wszystkieObiekty.Add(probka);
 
+        
+        List<iris> znormalizowaneWszystko = normalizacja.normalizowanie(wszystkieObiekty);
 
+        
+        iris znormalizowanaProbka = znormalizowaneWszystko[znormalizowaneWszystko.Count - 1];
 
+       
+        znormalizowaneWszystko.RemoveAt(znormalizowaneWszystko.Count - 1);
+
+        
+        knn(znormalizowaneWszystko, k, znormalizowanaProbka);
+
+       
+        List<List<iris>> podzielone = dzielenieNaKlasy(znormalizowaneWszystko);
+        List<double> sumaOdleglosci = najblizsze.najblizej(podzielone, k, znormalizowanaProbka);
+        int przypisanaKlasa = sumaOdleglosci.IndexOf(sumaOdleglosci.Min()) + 1;
+
+        Console.WriteLine($"Obiekt został przypisany do klasy: {przypisanaKlasa}");
     }
+
 }
