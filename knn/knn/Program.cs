@@ -248,38 +248,40 @@ class Program
         int k = 3;
         string sciezka = "C:/Users/1/source/repos/knn/dane.txt";
         List<iris> Kwiaty = stworzListe(sciezka);
-
-        
-        Console.WriteLine("Podaj parametr x:");
-        double xUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-        Console.WriteLine("Podaj parametr y:");
-        double yUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-        Console.WriteLine("Podaj parametr z:");
-        double zUser = double.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-
-        
-        iris probka = new iris(xUser, yUser, zUser);
         List<iris> wszystkieObiekty = new List<iris>(Kwiaty);
-        wszystkieObiekty.Add(probka);
 
         
         List<iris> znormalizowaneWszystko = normalizacja.normalizowanie(wszystkieObiekty);
+        int liczbaUdanych = 0;
+        int liczbaProbek = znormalizowaneWszystko.Count;
+        for (int i =0; i< znormalizowaneWszystko.Count; i++)
+        {
+            iris znormalizowanaProbka = znormalizowaneWszystko[i];
+            znormalizowaneWszystko.RemoveAt(i);
+            knn(znormalizowaneWszystko, k, znormalizowanaProbka);
+            
 
-        
-        iris znormalizowanaProbka = znormalizowaneWszystko[znormalizowaneWszystko.Count - 1];
+            List<List<iris>> podzielone = dzielenieNaKlasy(znormalizowaneWszystko);
+            List<double> sumaOdleglosci = najblizsze.najblizej(podzielone, k, znormalizowanaProbka);
+            int przypisanaKlasa = sumaOdleglosci.IndexOf(sumaOdleglosci.Min()) + 1;
 
-       
-        znormalizowaneWszystko.RemoveAt(znormalizowaneWszystko.Count - 1);
+            if (znormalizowanaProbka.klasa == przypisanaKlasa)
+            {
+                liczbaUdanych++;
+            }
 
-        
-        knn(znormalizowaneWszystko, k, znormalizowanaProbka);
+            Console.WriteLine($"Obiekt został przypisany do klasy: {przypisanaKlasa}");
+            znormalizowaneWszystko.Insert(i, znormalizowanaProbka);
 
-       
-        List<List<iris>> podzielone = dzielenieNaKlasy(znormalizowaneWszystko);
-        List<double> sumaOdleglosci = najblizsze.najblizej(podzielone, k, znormalizowanaProbka);
-        int przypisanaKlasa = sumaOdleglosci.IndexOf(sumaOdleglosci.Min()) + 1;
+        }
+        Console.WriteLine();
+        Console.WriteLine("wyniki końcowe:");
+        Console.WriteLine($"procent udanych {(double)liczbaUdanych / liczbaProbek}");
 
-        Console.WriteLine($"Obiekt został przypisany do klasy: {przypisanaKlasa}");
+
+
+
+
     }
 
 }
