@@ -28,6 +28,27 @@ public class E
         return Math.Sqrt((Math.Pow(a.x - b.x, 2)) + (Math.Pow(a.y - b.y, 2)) + (Math.Pow(a.z - b.z, 2)));
     }
 
+    public static double Manhattan(iris a, iris b)
+    {
+        return Math.Abs(a.x - b.x) + Math.Abs(a.y - b.y) + Math.Abs( a.z - b.z);
+    }
+
+    public static double Czebyszewa(iris a , iris b)
+    {
+        double liczba = Math.Abs(a.x - b.x);
+
+        if (Math.Abs(a.y - b.y)> liczba)
+        {
+            liczba = Math.Abs(a.y - b.y);
+        }
+        if(Math.Abs(a.z - b.z) > liczba)
+        {
+            liczba = Math.Abs(a.z - b.z);
+        }
+        return liczba;
+
+    }
+
 
     public static List<List<double>>  topKElements(List<List<iris>> ListaKlas, iris probka)
     {
@@ -44,7 +65,9 @@ public class E
             for(int xyz =0; xyz < ListaKlas[Klasa].Count; xyz++)
             {
 
-                odleglosciDlaKlas[Klasa].Add(Euklidesowa(ListaKlas[Klasa][xyz], probka));
+                //odleglosciDlaKlas[Klasa].Add(Euklidesowa(ListaKlas[Klasa][xyz], probka));
+                //odleglosciDlaKlas[Klasa].Add(Manhattan(ListaKlas[Klasa][xyz], probka));
+                odleglosciDlaKlas[Klasa].Add(Czebyszewa(ListaKlas[Klasa][xyz], probka));
             }
             
         }
@@ -226,9 +249,10 @@ class Program
     {
         List<List<iris>> podzieloneKlasy = dzielenieNaKlasy(Obiekty);
         List<double> najblizszeW = najblizsze.najblizej(podzieloneKlasy, k, probka);
-
-        for(int i =0; i<najblizszeW.Count; i++)
+        Console.WriteLine("=================================================");
+        for (int i =0; i<najblizszeW.Count; i++)
         {
+
             Console.WriteLine("odległości Eukalidesa");
             Console.Write("dla klasy" + (i+1) + ": ");
             Console.WriteLine(najblizszeW[i]);
@@ -249,15 +273,14 @@ class Program
         string sciezka = "C:/Users/1/source/repos/knn/dane.txt";
         List<iris> Kwiaty = stworzListe(sciezka);
         List<iris> wszystkieObiekty = new List<iris>(Kwiaty);
-
-        
         List<iris> znormalizowaneWszystko = normalizacja.normalizowanie(wszystkieObiekty);
+
         int liczbaUdanych = 0;
         int liczbaProbek = znormalizowaneWszystko.Count;
-        for (int i =0; i< znormalizowaneWszystko.Count; i++)
+        for (int walid_nr =0; walid_nr < znormalizowaneWszystko.Count; walid_nr++)
         {
-            iris znormalizowanaProbka = znormalizowaneWszystko[i];
-            znormalizowaneWszystko.RemoveAt(i);
+            iris znormalizowanaProbka = znormalizowaneWszystko[walid_nr];
+            znormalizowaneWszystko.RemoveAt(walid_nr);
             knn(znormalizowaneWszystko, k, znormalizowanaProbka);
             
 
@@ -271,10 +294,10 @@ class Program
             }
 
             Console.WriteLine($"Obiekt został przypisany do klasy: {przypisanaKlasa}");
-            znormalizowaneWszystko.Insert(i, znormalizowanaProbka);
+            znormalizowaneWszystko.Insert(walid_nr, znormalizowanaProbka);
 
         }
-        Console.WriteLine();
+        Console.WriteLine("=================================================");
         Console.WriteLine("wyniki końcowe:");
         Console.WriteLine($"procent udanych {(double)liczbaUdanych / liczbaProbek}");
 
